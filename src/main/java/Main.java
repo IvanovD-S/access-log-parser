@@ -23,12 +23,15 @@ public class Main {
             File file = new File(path);
             boolean fileExists = file.exists();
             boolean isDirectory = file.isDirectory();
-            if (fileExists && !isDirectory) {
-                correctPathsCount++;
-                System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
-            } else {
-                System.out.println("Указанный путь не найден или неверен. Попробуйте снова.");
+            if (isDirectory) {
+                System.out.println("Путь является папкой");
+                continue;
+            } else if (!fileExists) {
+                System.out.println("Файл не найден");
+                continue;
             }
+            correctPathsCount++;
+            System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
         }
     }
 }
