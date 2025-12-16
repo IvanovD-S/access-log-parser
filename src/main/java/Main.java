@@ -8,9 +8,10 @@ public class Main {
         fileName();
     }
 
-    public static void fileName() throws IOException {
+    public static void fileName() {
         Scanner sc = new Scanner(System.in);
         int correctPathsCount = 0;
+        boolean lineLarge1024 = false;
         int countLine = 0;
         int minLine = 0;
         int maxLine = 0;
@@ -36,7 +37,7 @@ public class Main {
             }
             correctPathsCount++;
             System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
-            FileReader fileReader = null;
+            FileReader fileReader;
             try {
                 fileReader = new FileReader(path);
             } catch (FileNotFoundException e) {
@@ -48,6 +49,8 @@ public class Main {
                 while ((line = reader.readLine()) != null) {
                     if (large1024(line)) {
                         System.out.println("Строка длиннее 1024 символов № " + (countLine + 1));
+                        lineLarge1024 = true;
+                        break;
                     }
                     int length = line.length();
                     countLine++;
@@ -61,12 +64,14 @@ public class Main {
             } catch (IOException e) {
                 System.out.println("Ошибка при работе с файлом: " + e.getMessage());
             }
-            System.out.println("Количество строк в файле: " + countLine);
-            System.out.println("Самая длинная строка: " + maxLine);
-            System.out.println("Самая короткая строка: " + minLine);
+            if (!lineLarge1024) {
+                System.out.println("Количество строк в файле: " + countLine);
+                System.out.println("Самая длинная строка: " + maxLine);
+                System.out.println("Самая короткая строка: " + minLine);
+            } else {
+                System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
+            }
         }
-
-
     }
 
     private static boolean large1024(String line) {
