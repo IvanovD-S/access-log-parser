@@ -1,15 +1,6 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-enum HttpMethod {
-    GET,
-    POST,
-    PUT,
-    DELETE,
-    OPTIONS,
-    PATCH,
-    HEAD
-};
+import java.util.Locale;
 
 public class LogEntry {
     private final String ipAddress;
@@ -26,7 +17,7 @@ public class LogEntry {
         String[] parts = logString.split("\\s+"); // Разделим строку по пробелам
 
         this.ipAddress = parts[0]; // IP адрес
-        this.timestamp = parseTimestamp(parts[3].substring(1)); // Время без квадратной скобки слева
+        this.timestamp = parseTimestamp(parts[3]); // Время без квадратной скобки слева
         this.method = HttpMethod.valueOf(parts[5].replaceAll("\"", "")); // Метод запроса без кавычек
         this.requestPath = parts[6]; // Путь запроса
         this.responseCode = Integer.parseInt(parts[8]); // Код статуса
@@ -67,9 +58,24 @@ public class LogEntry {
         return userAgent;
     }
 
-    // Парсер дат
     private LocalDateTime parseTimestamp(String dateStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[dd/MMM/yyyy:HH:mm:ss Z]");
+        if (dateStr.startsWith("[")) {
+            dateStr = dateStr.substring(1);
+        }
+        if (dateStr.endsWith("]")) {
+            dateStr = dateStr.substring(0, dateStr.length() - 1);
+        }
+
+        boolean hasTimeZone = dateStr.matches(".+\\s[+-]\\d{4}$");
+
+        DateTimeFormatter formatter;
+        if (hasTimeZone) {
+            formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss ZZZZ", Locale.ENGLISH);
+        } else {
+            formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss", Locale.ENGLISH);
+        }
+
         return LocalDateTime.parse(dateStr, formatter);
     }
+
 }

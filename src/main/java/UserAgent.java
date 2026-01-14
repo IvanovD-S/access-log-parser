@@ -13,23 +13,31 @@ public class UserAgent {
 
 
     public UserAgent(String agentString) {
+
         if (agentString.contains("Windows"))
             this.osType = WINDOWS;
+
         else if (agentString.contains("macOS"))
             this.osType = MAC_OS;
+
         else if (agentString.contains("Linux"))
             this.osType = LINUX;
+
         else
             this.osType = "Other";
 
         if (agentString.contains("Edge"))
             this.browserType = EDGE;
+
         else if (agentString.contains("Firefox"))
             this.browserType = FIREFOX;
+
         else if (agentString.contains("Chrome"))
             this.browserType = CHROME;
+
         else if (agentString.contains("Opera"))
             this.browserType = OPERA;
+
         else
             this.browserType = "Other";
     }

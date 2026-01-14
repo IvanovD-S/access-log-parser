@@ -1,4 +1,5 @@
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class Main {
@@ -14,6 +15,7 @@ public class Main {
         int countLine = 0;
         double yandexBot = 0;
         double googlebot = 0;
+        Statistics stats = new Statistics();
 
         while (true) {
             System.out.print("Введите путь к файлу или каталогу ('завершить' для выхода): ");
@@ -59,14 +61,20 @@ public class Main {
                     if (line.contains("YandexBot")) {
                         yandexBot++;
                     }
+
+                    LogEntry entry = new LogEntry(line);
+                    stats.addEntry(entry);
                 }
             } catch (IOException e) {
                 System.out.println("Ошибка при работе с файлом: " + e.getMessage());
             }
+
             if (!lineLarge1024) {
+                double trafficRate = stats.getTrafficRate();
                 System.out.println("Количество строк в файле: " + countLine);
-                System.out.println("Количество запросов Googlebot: " + ((googlebot / countLine) * 100) + "% от общего числа запросов");
-                System.out.println("Количество запросов YandexBot: " + ((yandexBot / countLine) * 100) + "% от общего числа запросов");
+                System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebot / countLine) * 10000)) / 100 + "% от общего числа запросов");
+                System.out.println("Количество запросов YandexBot: " + (Math.floor((yandexBot / countLine) * 10000)) / 100 + "% от общего числа запросов");
+                System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
             } else {
                 System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
             }
