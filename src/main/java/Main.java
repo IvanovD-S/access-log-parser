@@ -1,6 +1,8 @@
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -71,6 +73,12 @@ public class Main {
 
             if (!lineLarge1024) {
                 double trafficRate = stats.getTrafficRate();
+                Set<String> pages = stats.getExistingPages();
+                System.out.println("Существующие страницы: " + pages);
+                Map<String, Double> osStats = stats.getOsStatistics();
+                for (Map.Entry<String, Double> entry : osStats.entrySet()) {
+                    System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
+                }
                 System.out.println("Количество строк в файле: " + countLine);
                 System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebot / countLine) * 10000)) / 100 + "% от общего числа запросов");
                 System.out.println("Количество запросов YandexBot: " + (Math.floor((yandexBot / countLine) * 10000)) / 100 + "% от общего числа запросов");
