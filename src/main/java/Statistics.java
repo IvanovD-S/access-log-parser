@@ -7,12 +7,19 @@ import java.util.Set;
 
 public class Statistics {
     private int totalTraffic = 0;
+
     private LocalDateTime minTime = null;
     private LocalDateTime maxTime = null;
+
     private final Set<String> existingPages = new HashSet<>();
     private final Set<String> unexistingPages = new HashSet<>();
+
     private final Map<String, Integer> osFrequency = new HashMap<>();
     private final Map<String, Integer> browserFrequency = new HashMap<>();
+
+    private int userVisitsCount = 0;
+    private int errorRequestCount = 0;
+    private final Set<String> uniqueUserIps = new HashSet<>();
 
     public void addEntry(LogEntry entry) {
         totalTraffic += entry.getContentSizeBytes();
@@ -37,6 +44,21 @@ public class Statistics {
 
         if (entry.getResponseCode() == 404) {
             unexistingPages.add(entry.getRequestPath());
+        }
+
+        if (entry.getResponseCode() > 399 && entry.getResponseCode() < 600) {
+            errorRequestCount++;
+        }
+
+        UserAgent userAgent = entry.getUserAgent();
+        boolean isBot = userAgent.isBot();
+
+        if (!isBot) {
+            userVisitsCount++;
+            String ip = entry.getIpAddress();
+            if (ip != null && !ip.isEmpty()) {
+                uniqueUserIps.add(ip);
+            }
         }
 
         String os = entry.getUserAgent().getOsType();
@@ -104,13 +126,46 @@ public class Statistics {
 
     public double getTrafficRate() {
         if (minTime == null || maxTime == null)
-            return 0.0;
+            return 0;
 
         Duration duration = Duration.between(minTime, maxTime);
-
         long hoursDiff = Math.max(duration.toHours(), 1);
 
         return
                 (double) totalTraffic / hoursDiff / 1024;
+    }
+
+    public double getAverageVisitsPerHour() {
+        if (minTime == null || maxTime == null) {
+            return 0;
+        } else if (uniqueUserIps.isEmpty() || userVisitsCount == 0) {
+            return 0;
+        }
+
+        Duration duration = Duration.between(minTime, maxTime);
+        long hoursDiff = Math.max(duration.toHours(), 1);
+        return
+                (double) userVisitsCount / hoursDiff;
+    }
+
+    public double getAverageErrorRequestPerHour() {
+        if (minTime == null || maxTime == null || errorRequestCount == 0) {
+            return 0;
+        }
+
+        Duration duration = Duration.between(minTime, maxTime);
+        long hoursDiff = Math.max(duration.toHours(), 1);
+
+        return
+                (double) errorRequestCount / hoursDiff;
+    }
+
+    public double getAverageVisitsPerUser() {
+        if (uniqueUserIps.isEmpty() || userVisitsCount == 0) {
+            return 0;
+        }
+
+        return
+                (double) userVisitsCount / uniqueUserIps.size();
     }
 }

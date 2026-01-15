@@ -6,7 +6,6 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        // Задание #1. Обработка исключений
         fileName();
     }
 
@@ -31,6 +30,7 @@ public class Main {
             File file = new File(path);
             boolean fileExists = file.exists();
             boolean isDirectory = file.isDirectory();
+
             if (isDirectory) {
                 System.out.println("Путь является папкой");
                 continue;
@@ -38,9 +38,11 @@ public class Main {
                 System.out.println("Файл не найден");
                 continue;
             }
+
             correctPathsCount++;
             System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
             FileReader fileReader;
+
             try {
                 fileReader = new FileReader(path);
             } catch (FileNotFoundException e) {
@@ -55,11 +57,13 @@ public class Main {
                         lineLarge1024 = true;
                         break;
                     }
-                    int length = line.length();
+
                     countLine++;
+
                     if (line.contains("Googlebot")) {
                         googlebot++;
                     }
+
                     if (line.contains("YandexBot")) {
                         yandexBot++;
                     }
@@ -73,19 +77,33 @@ public class Main {
 
             if (!lineLarge1024) {
                 double trafficRate = stats.getTrafficRate();
+
                 Set<String> pages = stats.getExistingPages();
                 System.out.println("Существующие страницы: " + pages);
+
                 Set<String> unexistingPages = stats.getUnexistingPages();
                 System.out.println("Несуществующие страницы: " + unexistingPages);
+
                 Map<String, Double> osStats = stats.getOsStatistics();
                 for (Map.Entry<String, Double> entry : osStats.entrySet()) {
                     System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
                 }
+
                 Map<String, Double> browserStats = stats.getBrowserStatistics();
                 for (Map.Entry<String, Double> entry : browserStats.entrySet()) {
                     System.out.printf("Браузер: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
                 }
+
+                double averageVisitsPerHour = stats.getAverageVisitsPerHour();
+                double averageErrorRequestPerHour = stats.getAverageErrorRequestPerHour();
+                double averageVisitsPerUser = stats.getAverageVisitsPerUser();
+
                 System.out.println("Количество строк в файле: " + countLine);
+
+                System.out.printf("Среднее количество посетителей сайта за час: %.4f%n", averageVisitsPerHour);
+                System.out.printf("Среднее количество ошибочных запросов в час: %.4f%n", averageErrorRequestPerHour);
+                System.out.printf("Средняя посещаемость одним пользователем: %.4f%n", averageVisitsPerUser);
+
                 System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebot / countLine) * 10000)) / 100 + "% от общего числа запросов");
                 System.out.println("Количество запросов YandexBot: " + (Math.floor((yandexBot / countLine) * 10000)) / 100 + "% от общего числа запросов");
                 System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
