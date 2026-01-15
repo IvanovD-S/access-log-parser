@@ -11,7 +11,6 @@ public class UserAgent {
     private static final String CHROME = "Chrome";
     private static final String OPERA = "Opera";
 
-
     public UserAgent(String agentString) {
 
         if (agentString.contains("Windows"))

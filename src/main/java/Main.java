@@ -75,9 +75,15 @@ public class Main {
                 double trafficRate = stats.getTrafficRate();
                 Set<String> pages = stats.getExistingPages();
                 System.out.println("Существующие страницы: " + pages);
+                Set<String> unexistingPages = stats.getUnexistingPages();
+                System.out.println("Несуществующие страницы: " + unexistingPages);
                 Map<String, Double> osStats = stats.getOsStatistics();
                 for (Map.Entry<String, Double> entry : osStats.entrySet()) {
                     System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
+                }
+                Map<String, Double> browserStats = stats.getBrowserStatistics();
+                for (Map.Entry<String, Double> entry : browserStats.entrySet()) {
+                    System.out.printf("Браузер: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
                 }
                 System.out.println("Количество строк в файле: " + countLine);
                 System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebot / countLine) * 10000)) / 100 + "% от общего числа запросов");
@@ -96,4 +102,3 @@ public class Main {
         return false;
     }
 }
-

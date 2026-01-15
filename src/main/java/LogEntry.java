@@ -12,7 +12,6 @@ public class LogEntry {
     private final String referrer;
     private final UserAgent userAgent;
 
-
     public LogEntry(String logString) {
         String[] parts = logString.split("\\s+");
 
