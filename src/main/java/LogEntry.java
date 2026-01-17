@@ -3,27 +3,59 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class LogEntry {
-    private final String ipAddress;
-    private final LocalDateTime timestamp;
-    private final HttpMethod method;
-    private final String requestPath;
-    private final int responseCode;
-    private final int contentSizeBytes;
-    private final String referrer;
-    private final UserAgent userAgent;
+    private String ipAddress;
+    private LocalDateTime timestamp;
+    private HttpMethod method;
+    private String requestPath;
+    private int responseCode;
+    private int contentSizeBytes;
+    private String referrer;
+    private UserAgent userAgent;
 
     public LogEntry(String logString) {
         String[] parts = logString.split("\\s+");
 
-        this.ipAddress = parts[0];
-        this.timestamp = parseTimestamp(parts[3]);
-        this.method = HttpMethod.valueOf(parts[5].replaceAll("\"", ""));
-        this.requestPath = parts[6];
-        this.responseCode = Integer.parseInt(parts[8]);
-        this.contentSizeBytes = Integer.parseInt(parts[9]);
-        this.referrer = parts[10].equals("-") ? "" : parts[10];
+        this.ipAddress = "unknown";
+        this.timestamp = LocalDateTime.of(1970, 1, 1, 0, 0);
+        this.method = HttpMethod.UNKNOWN;
+        this.requestPath = "/";
+        this.responseCode = 0;
+        this.contentSizeBytes = 0;
+        this.referrer = "";
+        this.userAgent = new UserAgent("Other");
+
+        if (parts.length > 0) {
+            this.ipAddress = parts[0];
+        }
+
+        if (parts.length >= 3){
+            this.timestamp = parseTimestamp(parts[3]);
+        }
+
+        if (parts.length >= 5) {
+            this.method = HttpMethod.valueOf(parts[5].replaceAll("\"", ""));
+        }
+
+        if (parts.length >= 6) {
+            this.requestPath = parts[6];
+        }
+
+        if (parts.length >= 8) {
+            this.responseCode = Integer.parseInt(parts[8]);
+        }
+
+        if (parts.length >= 9) {
+            this.contentSizeBytes = Integer.parseInt(parts[9]);
+        }
+
+        if (parts.length >= 10) {
+            this.referrer = parts[10].equals("-") ? "" : parts[10];
+        }
+
         String userAgentStr = extractUserAgent(parts);
-        this.userAgent = new UserAgent(userAgentStr);
+        if (parts.length >= 11) {
+            this.userAgent = new UserAgent(userAgentStr);
+        }
     }
 
     public String getIpAddress() {
