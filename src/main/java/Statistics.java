@@ -73,7 +73,6 @@ public class Statistics {
 
         long hoursDiff = Math.max(duration.toHours(), 1);
 
-        return
-                (double) totalTraffic / hoursDiff / 1024;
+        return (double) totalTraffic / hoursDiff / 1024;
     }
 }

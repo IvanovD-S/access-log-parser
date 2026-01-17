@@ -23,8 +23,7 @@ public class UserAgent {
         else if (agentString.contains("Linux"))
             this.osType = LINUX;
 
-        else
-            this.osType = "Other";
+        else this.osType = "Other";
 
         if (agentString.contains("Edge"))
             this.browserType = EDGE;
