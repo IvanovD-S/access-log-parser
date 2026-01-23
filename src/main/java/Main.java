@@ -6,7 +6,6 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
-        // Задание #1. Обработка исключений
         try {
             fileName();
         } catch (IOException e) {
@@ -43,42 +42,77 @@ public class Main {
                 continue;
             }
             correctPathsCount++;
-            System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
-            FileReader fileReader;
-            try {
-                fileReader = new FileReader(path);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            System.out.println("Указанный путь найден. Указано правильных путей: " + correctPathsCount);
 
-            BufferedReader reader = new BufferedReader(fileReader);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                isLineMoreLengthOf = isLineMoreLengthOf(line, 1024);
-                if (isLineMoreLengthOf) {
-                    System.out.println("Строка длиннее 1024 символов № " + (countLine + 1));
-                    break;
-                }
-                countLine++;
-                if (line.contains("Googlebot")) {
-                    googlebotCount++;
-                }
-                if (line.contains("YandexBot")) {
-                    yandexBotCount++;
-                }
+            try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.length() > 1024) {
+                        System.out.println("Строка длиннее 1024 символов № " + (countLine + 1));
+                        isLineMoreLengthOf = true;
+                        break;
+                    }
 
-                LogEntry entry = new LogEntry(line);
-                stats.addEntry(entry);
+                    countLine++;
+                    if (line.contains("Googlebot")) {
+                        googlebotCount++;
+                    }
+                    if (line.contains("YandexBot")) {
+                        yandexBotCount++;
+                    }
+
+                    try {
+                        LogEntry entry = new LogEntry(line);
+                        stats.addEntry(entry);
+                    } catch (Exception e) {
+                        System.err.println("Ошибка обработки строки №" + countLine + ": " + e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Ошибка чтения файла: " + e.getMessage());
+                continue;
             }
         }
 
-        if (!isLineMoreLengthOf) {
-            double trafficRate = stats.getTrafficRate();
-            Set<String> pages = stats.getExistingPages();
-            System.out.println("Существующие страницы: " + pages);
-            Map<String, Double> osStats = stats.getOsStatistics();
-            for (Map.Entry<String, Double> entry : osStats.entrySet()) {
-                System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
+
+            if (countLine > 0) {
+                double trafficRate = stats.getTrafficRate();
+
+                Set<String> pages = stats.getExistingPages();
+                System.out.println("Существующие страницы: " + pages);
+
+                Set<String> unexistingPages = stats.getUnexistingPages();
+                System.out.println("Несуществующие страницы: " + unexistingPages);
+
+                Map<String, Double> osStats = stats.getOsStatistics();
+                for (Map.Entry<String, Double> entry : osStats.entrySet()) {
+                    System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
+                }
+
+                Map<String, Double> browserStats = stats.getBrowserStatistics();
+                for (Map.Entry<String, Double> entry : browserStats.entrySet()) {
+                    System.out.printf("Браузер: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
+                }
+
+                double averageVisitsPerHour = stats.getAverageVisitsPerHour();
+                double averageErrorRequestPerHour = stats.getAverageErrorRequestPerHour();
+                double averageVisitsPerUser = stats.getAverageVisitsPerUser();
+
+                System.out.println("Количество строк в файле: " + countLine);
+
+                System.out.printf("Среднее количество посетителей сайта за час: %.4f%n", averageVisitsPerHour);
+                System.out.printf("Среднее количество ошибочных запросов в час: %.4f%n", averageErrorRequestPerHour);
+                System.out.printf("Средняя посещаемость одним пользователем: %.4f%n", averageVisitsPerUser);
+
+                double googlebotCountRequest = (Math.floor((googlebotCount / countLine) * 10000)) / 100;
+                double yandexBotCountRequest = (Math.floor((yandexBotCount / countLine) * 10000)) / 100;
+                System.out.println("Количество запросов Googlebot: " + googlebotCountRequest + "% от общего числа запросов");
+                System.out.println("Количество запросов YandexBot: " + yandexBotCountRequest + "% от общего числа запросов");
+                System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
+            }
+
+            if (isLineMoreLengthOf) {
+                System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
             }
             System.out.println("Количество строк в файле: " + countLine);
             double googlebotCountRequest = (Math.floor((googlebotCount / countLine) * 10000)) / 100;
@@ -91,12 +125,6 @@ public class Main {
         }
     }
 
-    private static boolean isLineMoreLengthOf(String line, int length) {
-        if (line.length() > length) {
-            return true;
-        }
-        return false;
-    }
 }
 
 

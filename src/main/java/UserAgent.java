@@ -1,6 +1,7 @@
 public class UserAgent {
     private final String osType;
     private final String browserType;
+    private final String rawAgentString;
 
     private static final String WINDOWS = "Windows";
     private static final String MAC_OS = "macOS";
@@ -11,8 +12,8 @@ public class UserAgent {
     private static final String CHROME = "Chrome";
     private static final String OPERA = "Opera";
 
-
     public UserAgent(String agentString) {
+        this.rawAgentString = agentString;
 
         if (agentString.contains("Windows"))
             this.osType = WINDOWS;
@@ -48,5 +49,15 @@ public class UserAgent {
 
     public String getOsType() {
         return osType;
+    }
+
+    public boolean isBot() {
+        if (rawAgentString == null || rawAgentString.isEmpty()) {
+            return false;
+        }
+        else if (rawAgentString.toLowerCase().contains("bot")){
+            return true;
+        }
+        return false;
     }
 }
