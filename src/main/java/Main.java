@@ -81,8 +81,10 @@ public class Main {
                 System.out.printf("ОС: %s, Доля: %.4f%n", entry.getKey(), entry.getValue());
             }
             System.out.println("Количество строк в файле: " + countLine);
-            System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebotCount / countLine) * 10000)) / 100 + "% от общего числа запросов");
-            System.out.println("Количество запросов YandexBot: " + (Math.floor((yandexBotCount / countLine) * 10000)) / 100 + "% от общего числа запросов");
+            double googlebotCountRequest = (Math.floor((googlebotCount / countLine) * 10000)) / 100;
+            double yandexBotCountRequest = (Math.floor((yandexBotCount / countLine) * 10000)) / 100;
+            System.out.println("Количество запросов Googlebot: " + googlebotCountRequest + "% от общего числа запросов");
+            System.out.println("Количество запросов YandexBot: " + yandexBotCountRequest + "% от общего числа запросов");
             System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
         } else {
             System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
