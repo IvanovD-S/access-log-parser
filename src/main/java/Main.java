@@ -1,21 +1,25 @@
 import java.io.*;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        fileName();
+
+    public static void main(String[] args) {
+        try {
+            fileName();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static void fileName() {
+    public static void fileName() throws IOException {
         Scanner sc = new Scanner(System.in);
         int correctPathsCount = 0;
-        boolean lineLarge1024 = false;
         int countLine = 0;
-        double yandexBot = 0;
-        double googlebot = 0;
+        double yandexBotCount = 0;
+        double googlebotCount = 0;
+        boolean isLineMoreLengthOf = false;
         Statistics stats = new Statistics();
 
         while (true) {
@@ -30,7 +34,6 @@ public class Main {
             File file = new File(path);
             boolean fileExists = file.exists();
             boolean isDirectory = file.isDirectory();
-
             if (isDirectory) {
                 System.out.println("Путь является папкой");
                 continue;
@@ -38,44 +41,40 @@ public class Main {
                 System.out.println("Файл не найден");
                 continue;
             }
-
             correctPathsCount++;
-            System.out.println("Указанный путь найден. Указано правильный путей: " + correctPathsCount);
-            FileReader fileReader;
+            System.out.println("Указанный путь найден. Указано правильных путей: " + correctPathsCount);
 
-            try {
-                fileReader = new FileReader(path);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                BufferedReader reader = new BufferedReader(fileReader);
+            try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (large1024(line)) {
+                    if (line.length() > 1024) {
                         System.out.println("Строка длиннее 1024 символов № " + (countLine + 1));
-                        lineLarge1024 = true;
+                        isLineMoreLengthOf = true;
                         break;
                     }
 
                     countLine++;
-
                     if (line.contains("Googlebot")) {
-                        googlebot++;
+                        googlebotCount++;
                     }
-
                     if (line.contains("YandexBot")) {
-                        yandexBot++;
+                        yandexBotCount++;
                     }
 
-                    LogEntry entry = new LogEntry(line);
-                    stats.addEntry(entry);
+                    try {
+                        LogEntry entry = new LogEntry(line);
+                        stats.addEntry(entry);
+                    } catch (Exception e) {
+                        System.err.println("Ошибка обработки строки №" + countLine + ": " + e.getMessage());
+                    }
                 }
             } catch (IOException e) {
-                System.out.println("Ошибка при работе с файлом: " + e.getMessage());
+                System.err.println("Ошибка чтения файла: " + e.getMessage());
+                continue;
             }
 
-            if (!lineLarge1024) {
+
+            if (countLine > 0) {
                 double trafficRate = stats.getTrafficRate();
 
                 Set<String> pages = stats.getExistingPages();
@@ -104,19 +103,18 @@ public class Main {
                 System.out.printf("Среднее количество ошибочных запросов в час: %.4f%n", averageErrorRequestPerHour);
                 System.out.printf("Средняя посещаемость одним пользователем: %.4f%n", averageVisitsPerUser);
 
-                System.out.println("Количество запросов Googlebot: " + (Math.floor((googlebot / countLine) * 10000)) / 100 + "% от общего числа запросов");
-                System.out.println("Количество запросов YandexBot: " + (Math.floor((yandexBot / countLine) * 10000)) / 100 + "% от общего числа запросов");
+                double googlebotCountRequest = (Math.floor((googlebotCount / countLine) * 10000)) / 100;
+                double yandexBotCountRequest = (Math.floor((yandexBotCount / countLine) * 10000)) / 100;
+                System.out.println("Количество запросов Googlebot: " + googlebotCountRequest + "% от общего числа запросов");
+                System.out.println("Количество запросов YandexBot: " + yandexBotCountRequest + "% от общего числа запросов");
                 System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
-            } else {
+            }
+
+            if (isLineMoreLengthOf) {
                 System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
             }
         }
     }
 
-    private static boolean large1024(String line) {
-        if (line.length() > 1024) {
-            return true;
-        }
-        return false;
-    }
 }
+
