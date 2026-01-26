@@ -72,8 +72,6 @@ public class Main {
                 System.err.println("Ошибка чтения файла: " + e.getMessage());
                 continue;
             }
-        }
-
 
             if (countLine > 0) {
                 double trafficRate = stats.getTrafficRate();
@@ -114,17 +112,8 @@ public class Main {
             if (isLineMoreLengthOf) {
                 System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
             }
-            System.out.println("Количество строк в файле: " + countLine);
-            double googlebotCountRequest = (Math.floor((googlebotCount / countLine) * 10000)) / 100;
-            double yandexBotCountRequest = (Math.floor((yandexBotCount / countLine) * 10000)) / 100;
-            System.out.println("Количество запросов Googlebot: " + googlebotCountRequest + "% от общего числа запросов");
-            System.out.println("Количество запросов YandexBot: " + yandexBotCountRequest + "% от общего числа запросов");
-            System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
-        } else {
-            System.out.println("Работа с файлом прекращена из-за наличия строки длиннее 1024 символов");
         }
     }
-
 }
 
 
