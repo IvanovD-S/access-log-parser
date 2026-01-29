@@ -28,7 +28,7 @@ public class LogEntry {
             this.ipAddress = parts[0];
         }
 
-        if (parts.length >= 3){
+        if (parts.length >= 3) {
             this.timestamp = parseTimestamp(parts[3]);
         }
 
@@ -49,7 +49,7 @@ public class LogEntry {
         }
 
         if (parts.length >= 10) {
-            this.referrer = parts[10].equals("-") ? "" : parts[10];
+            this.referrer = parts[10];
         }
 
         String userAgentStr = extractUserAgent(parts);
