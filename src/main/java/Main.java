@@ -107,6 +107,10 @@ public class Main {
                 System.out.println("Количество запросов Googlebot: " + googlebotCountRequest + "% от общего числа запросов");
                 System.out.println("Количество запросов YandexBot: " + yandexBotCountRequest + "% от общего числа запросов");
                 System.out.println("Интенсивность трафика: " + Math.floor(trafficRate * 100) / 100 + " Кб/ч");
+
+                System.out.println("Пиковая посещаемость (в секунду): " + stats.getPeakVisitsPerSecond());
+                System.out.println("Домены-рефереры: " + stats.getReferrerDomains());
+                System.out.println("Максимальная посещаемость одним пользователем: " + stats.getMaxVisitsBySingleUser());
             }
 
             if (isLineMoreLengthOf) {
